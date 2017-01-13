@@ -1,0 +1,58 @@
+# UMR ENTROPIE PROJECTS WEBSITE
+projectsdb:
+  hostname: projectsdb
+  image: sylviefiat/alpine-mysql
+  #volumes:
+  #  - ./projectsdb_data/mysql:/app/mysql
+  ports:
+    - "3406:3306"
+  environment:
+    - MYSQL_DATABASE=projects
+    - MYSQL_USERNAME=docker
+    - MYSQL_PASSWORD=docker
+    - MYSQL_ROOT_PASSWORD=docker
+
+html:
+  hostname: projectshtml
+  image: sylviefiat/alpine-php
+  ports:
+    - "71:80"
+  environment:
+    - DB_USER=root
+    - DB_PASS=docker
+    - DB_HOST=projectsdb
+    - DB_NAME=projects
+  volumes:
+    - ./html_data/html:/var/www/html
+    - ./html_data/config:/usr/local/etc/php/
+  links:
+    - projectsdb:projectsdb
+
+scratchpad:
+  hostname: scratchpad
+  image: sylviefiat/alpine-php
+  ports:
+    - "72:80"
+  environment:
+    - DB_USER=root
+    - DB_PASS=docker
+    - DB_HOST=projectsdb
+    - DB_NAME=projects
+  volumes:
+    - ./scratchpad_data/html:/var/www/html
+    - ./scratchpad_data/config:/usr/local/etc/php/
+  links:
+    - projectsdb:projectsdb
+
+tomcat:
+  hostname: tomcat
+  image: tomcat:8.0-alpine
+  ports: 
+    - "8070:8080"
+  volumes:
+    - ./tomcat_data/webapps:/usr/local/tomcat/webapps
+    - ./tomcat_data/conf:/usr/local/tomcat/conf
+    - ./tomcat_data/lib:/usr/local/tomcat/lib
+  links:
+    - projectsdb:projectsdb
+
